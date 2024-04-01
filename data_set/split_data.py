@@ -13,6 +13,15 @@ def mk_file(file_path: str):
 def main():
     # 保证随机可复现
     random.seed(0)
+    # # 每次运行main函数，下面两个输出结果都是一样的，比如每次都是0.8444218515250481，0.7579544029403025
+    # print(random.random())  # 每次都是0.8444218515250481
+    # print(random.random())  # 每次都是0.7579544029403025
+
+    # 如果想要每次运行main函数，两个函数的输出结果也是一样可以这样，设置相同的种子
+    # random.seed(0)
+    # print(random.random())  # 每次都是0.8444218515250481
+    # random.seed(0)
+    # print(random.random())  # 每次都是0.8444218515250481
 
     # 将数据集中10%的数据划分到验证集中
     split_rate = 0.1
@@ -39,7 +48,7 @@ def main():
     for cla in flower_class:
         # 建立每个类别对应的文件夹
         mk_file(os.path.join(val_root, cla))
-
+    # 分别对每个类别都随机采样固定的验证比例
     for cla in flower_class:
         cla_path = os.path.join(origin_flower_path, cla)
         images = os.listdir(cla_path)

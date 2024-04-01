@@ -1,5 +1,9 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+# input shape (3,32,32)
+# 两次conv5x5，每次conv后接一个maxPooling + 三次fc
 
 
 class LeNet(nn.Module):
@@ -21,7 +25,6 @@ class LeNet(nn.Module):
         x = x.view(-1, 32*5*5)       # output(32*5*5)
         x = F.relu(self.fc1(x))      # output(120)
         x = F.relu(self.fc2(x))      # output(84)
-        x = self.fc3(x)              # output(10)
+        x = self.fc3(x)              # output(10)  loss里面已经有更加高效的softmax计算
         return x
-
-
+    
