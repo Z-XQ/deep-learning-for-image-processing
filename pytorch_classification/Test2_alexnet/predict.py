@@ -18,15 +18,15 @@ def main():
          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     # load image
-    img_path = "../tulip.jpg"
+    img_path = "rose.png"
     assert os.path.exists(img_path), "file: '{}' dose not exist.".format(img_path)
     img = Image.open(img_path)
 
     plt.imshow(img)
     # [N, C, H, W]
-    img = data_transform(img)
+    img = data_transform(img)  # (h,w,c) -> (c,h,w)
     # expand batch dimension
-    img = torch.unsqueeze(img, dim=0)
+    img = torch.unsqueeze(img, dim=0)  # (1,c,h,w)
 
     # read class_indict
     json_path = './class_indices.json'
@@ -46,9 +46,9 @@ def main():
     model.eval()
     with torch.no_grad():
         # predict class
-        output = torch.squeeze(model(img.to(device))).cpu()
-        predict = torch.softmax(output, dim=0)
-        predict_cla = torch.argmax(predict).numpy()
+        output = torch.squeeze(model(img.to(device))).cpu()  # (5,)
+        predict = torch.softmax(output, dim=0)  # (5,)
+        predict_cla = torch.argmax(predict).numpy()  # (1,)
 
     print_res = "class: {}   prob: {:.3}".format(class_indict[str(predict_cla)],
                                                  predict[predict_cla].numpy())

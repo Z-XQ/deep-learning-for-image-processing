@@ -41,7 +41,7 @@ def main():
     with open('class_indices.json', 'w') as json_file:
         json_file.write(json_str)
 
-    batch_size = 32
+    batch_size = 4
     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])  # number of workers
     print('Using {} dataloader workers every process'.format(nw))
 
@@ -58,9 +58,9 @@ def main():
 
     print("using {} images for training, {} images for validation.".format(train_num,
                                                                            val_num))
-    # test_data_iter = iter(validate_loader)
-    # test_image, test_label = test_data_iter.next()
-    #
+    test_data_iter = iter(validate_loader)
+    test_image, test_label = next(test_data_iter)
+
     # def imshow(img):
     #     img = img / 2 + 0.5  # unnormalize
     #     npimg = img.numpy()
@@ -88,15 +88,18 @@ def main():
         train_bar = tqdm(train_loader, file=sys.stdout)
         for step, data in enumerate(train_bar):
             images, labels = data
+            images = images.to(device)
+            labels = labels.to(device)
+
             optimizer.zero_grad()
-            outputs = net(images.to(device))
-            loss = loss_function(outputs, labels.to(device))
+
+            outputs = net(images)  # images(b,3,224,224). outputs(b,5)
+            loss = loss_function(outputs, labels)  # labels(b,5). labels[6] = 4
             loss.backward()
             optimizer.step()
 
             # print statistics
             running_loss += loss.item()
-
             train_bar.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1,
                                                                      epochs,
                                                                      loss)
@@ -107,12 +110,15 @@ def main():
         with torch.no_grad():
             val_bar = tqdm(validate_loader, file=sys.stdout)
             for val_data in val_bar:
-                val_images, val_labels = val_data
-                outputs = net(val_images.to(device))
-                predict_y = torch.max(outputs, dim=1)[1]
+                val_images, val_labels = val_data  # val_labels(b,)
+                val_images = val_images.to(device)
+                val_labels = val_labels.to(device)
+
+                outputs = net(val_images.to(device))  # outputs(b,5)
+                predict_y = torch.max(outputs, dim=1)[1]  # predict_y(b,)
                 acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
 
-        val_accurate = acc / val_num
+        val_accurate = acc / val_num  # 整个验证集合的准确率
         print('[epoch %d] train_loss: %.3f  val_accuracy: %.3f' %
               (epoch + 1, running_loss / train_steps, val_accurate))
 

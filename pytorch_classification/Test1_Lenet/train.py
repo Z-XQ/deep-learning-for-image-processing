@@ -35,9 +35,8 @@ def main():
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(net.parameters(), lr=0.001)
 
-    net.train()
     for epoch in range(5):  # loop over the dataset multiple times
-
+        net.train()
         running_loss = 0.0
         for step, data in enumerate(train_loader, start=0):
             # get the inputs; data is a list of [inputs, labels]
@@ -55,18 +54,18 @@ def main():
 
             # print statistics
             running_loss += loss.item()
-            if step % 500 == 499:    # print every 500 mini-batches
-                with torch.no_grad():  # 进入eval模型，节省资源
-                    val_image = val_image.to(device)
-                    val_label = val_label.to(device)
-                    outputs = net(val_image)  # [batch, 10]
-                    # outputs(b,10). predict_y(b,). predict_y[3]=8
-                    predict_y = torch.max(outputs, dim=1)[1]
-                    accuracy = torch.eq(predict_y, val_label).sum().item() / val_label.size(0)
 
-                    print('[%d, %5d] train_loss: %.3f  test_accuracy: %.3f' %
-                          (epoch + 1, step + 1, running_loss / 500, accuracy))
-                    running_loss = 0.0
+        net.train()
+        with torch.no_grad():  # 进入eval模型，节省资源
+            val_image = val_image.to(device)
+            val_label = val_label.to(device)
+            outputs = net(val_image)  # [batch, 10]
+            # outputs(b,10). predict_y(b,). predict_y[3]=8
+            predict_y = torch.max(outputs, dim=1)[1]
+            accuracy = torch.eq(predict_y, val_label).sum().item() / val_label.size(0)
+
+            print('[%d] train_loss: %.3f  test_accuracy: %.3f' %
+                  (epoch + 1, running_loss / len(train_loader), accuracy))
 
     print('Finished Training')
 
