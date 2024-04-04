@@ -37,12 +37,12 @@ class VGG(nn.Module):
 
     def _initialize_weights(self):
         for m in self.modules():
-            if isinstance(m, nn.Conv2d):
+            if isinstance(m, nn.Conv2d):  # 1卷积
                 # nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
                 nn.init.xavier_uniform_(m.weight)
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.Linear):
+            elif isinstance(m, nn.Linear):  # 2全链接层
                 nn.init.xavier_uniform_(m.weight)
                 # nn.init.normal_(m.weight, 0, 0.01)
                 nn.init.constant_(m.bias, 0)
@@ -50,17 +50,22 @@ class VGG(nn.Module):
 
 def make_features(cfg: list):
     layers = []
-    in_channels = 3
+    in_channels = 3  # 初始为3
     for v in cfg:
         if v == "M":
-            layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
+            layers += [nn.MaxPool2d(kernel_size=2, stride=2)]  # (224-2-2*0) / 2 + 1 = 112
         else:
             conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
             layers += [conv2d, nn.ReLU(True)]
             in_channels = v
-    return nn.Sequential(*layers)
+    return nn.Sequential(*layers)  # layer是一个list，而Sequential参数单独多个模块，所以需要前面加*号拆分。
 
 
+"""
+M是maxPooling操作，数字是输出通道数
+conv(3x3,s=1,p=1)
+maxPooling(k=2,s=2)
+"""
 cfgs = {
     'vgg11': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'vgg13': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
@@ -75,3 +80,9 @@ def vgg(model_name="vgg16", **kwargs):
 
     model = VGG(make_features(cfg), **kwargs)
     return model
+
+
+# vgg16 = vgg("vgg16", num_classes=5, init_weights=True)
+# input = torch.randn((4, 3, 224, 224))
+# output = vgg16(input)
+# print(output.shape)

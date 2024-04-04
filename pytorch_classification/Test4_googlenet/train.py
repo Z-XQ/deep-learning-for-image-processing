@@ -90,6 +90,8 @@ def main():
         for step, data in enumerate(train_bar):
             images, labels = data
             optimizer.zero_grad()
+
+            # 同时训练三个分支
             logits, aux_logits2, aux_logits1 = net(images.to(device))
             loss0 = loss_function(logits, labels.to(device))
             loss1 = loss_function(aux_logits1, labels.to(device))

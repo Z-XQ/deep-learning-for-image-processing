@@ -3,8 +3,13 @@ import torch
 import torch.nn.functional as F
 
 
+# 训练时使用多个分类头，测试时只用主分类头
 class GoogLeNet(nn.Module):
     def __init__(self, num_classes=1000, aux_logits=True, init_weights=False):
+        """
+        aux_logits: 训练时设置，控制是否训练辅助头
+        测试时，通过self.training，使得一定只有一个输出。
+        """
         super(GoogLeNet, self).__init__()
         self.aux_logits = aux_logits
 
@@ -105,12 +110,16 @@ class GoogLeNet(nn.Module):
 
 class Inception(nn.Module):
     def __init__(self, in_channels, ch1x1, ch3x3red, ch3x3, ch5x5red, ch5x5, pool_proj):
+        """
+        ch1x1: 分支1，conv1x1输出通道
+        ch3x3red：分支2，conv1x1输出通道
+        """
         super(Inception, self).__init__()
 
         self.branch1 = BasicConv2d(in_channels, ch1x1, kernel_size=1)
 
         self.branch2 = nn.Sequential(
-            BasicConv2d(in_channels, ch3x3red, kernel_size=1),
+            BasicConv2d(in_channels, ch3x3red, kernel_size=1),  # conv1x1
             BasicConv2d(ch3x3red, ch3x3, kernel_size=3, padding=1)   # 保证输出大小等于输入大小
         )
 
@@ -136,6 +145,7 @@ class Inception(nn.Module):
         return torch.cat(outputs, 1)
 
 
+# 两个辅助输出结构一样，只是输入通道不同。
 class InceptionAux(nn.Module):
     def __init__(self, in_channels, num_classes):
         super(InceptionAux, self).__init__()
@@ -162,6 +172,7 @@ class InceptionAux(nn.Module):
         return x
 
 
+# conv+ReLU
 class BasicConv2d(nn.Module):
     def __init__(self, in_channels, out_channels, **kwargs):
         super(BasicConv2d, self).__init__()
