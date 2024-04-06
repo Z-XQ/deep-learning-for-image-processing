@@ -18,6 +18,7 @@ def _make_divisible(ch, divisor=8, min_ch=None):
     return new_ch
 
 
+# conv+bn+relu
 class ConvBNReLU(nn.Sequential):
     def __init__(self, in_channel, out_channel, kernel_size=3, stride=1, groups=1):
         padding = (kernel_size - 1) // 2

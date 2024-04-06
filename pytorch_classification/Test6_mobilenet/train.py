@@ -8,7 +8,7 @@ import torch.optim as optim
 from torchvision import transforms, datasets
 from tqdm import tqdm
 
-from model_v2 import MobileNetV2
+from model_v3 import mobilenet_v3_large  # 改成v3即可训练v3
 
 
 def main():
@@ -61,11 +61,11 @@ def main():
                                                                            val_num))
 
     # create model
-    net = MobileNetV2(num_classes=5)
+    net = mobilenet_v3_large(num_classes=5)
 
     # load pretrain weights
     # download url: https://download.pytorch.org/models/mobilenet_v2-b0353104.pth
-    model_weight_path = "./mobilenet_v2.pth"
+    model_weight_path = "./mobilenet_v3_large.pth"
     assert os.path.exists(model_weight_path), "file {} dose not exist.".format(model_weight_path)
     pre_weights = torch.load(model_weight_path, map_location='cpu')
 
@@ -73,6 +73,7 @@ def main():
     pre_dict = {k: v for k, v in pre_weights.items() if net.state_dict()[k].numel() == v.numel()}
     missing_keys, unexpected_keys = net.load_state_dict(pre_dict, strict=False)
 
+    # 只训练后面两层全连接层
     # freeze features weights
     for param in net.features.parameters():
         param.requires_grad = False
@@ -87,7 +88,7 @@ def main():
     optimizer = optim.Adam(params, lr=0.0001)
 
     best_acc = 0.0
-    save_path = './MobileNetV2.pth'
+    save_path = './mobilenet_v3_large.pth'
     train_steps = len(train_loader)
     for epoch in range(epochs):
         # train
