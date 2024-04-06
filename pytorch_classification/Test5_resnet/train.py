@@ -15,13 +15,14 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("using {} device.".format(device))
 
+    # 要使用官方预训练权重，就必须和官方有一样的数据预处理
     data_transform = {
         "train": transforms.Compose([transforms.RandomResizedCrop(224),
                                      transforms.RandomHorizontalFlip(),
                                      transforms.ToTensor(),
                                      transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
-        "val": transforms.Compose([transforms.Resize(256),
-                                   transforms.CenterCrop(224),
+        "val": transforms.Compose([transforms.Resize(256),  # 这里的resize是将最小边缩放到256，保持长宽比不变
+                                   transforms.CenterCrop(224),  # 再中心裁剪出224大小的图片
                                    transforms.ToTensor(),
                                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])}
 
@@ -57,7 +58,8 @@ def main():
 
     print("using {} images for training, {} images for validation.".format(train_num,
                                                                            val_num))
-    
+
+    # 载入预训练权重
     net = resnet34()
     # load pretrain weights
     # download url: https://download.pytorch.org/models/resnet34-333f7ec4.pth
@@ -68,8 +70,8 @@ def main():
     #     param.requires_grad = False
 
     # change fc layer structure
-    in_channel = net.fc.in_features
-    net.fc = nn.Linear(in_channel, 5)
+    in_channel = net.fc.in_features    # 获取全连接层的输入通道数
+    net.fc = nn.Linear(in_channel, 5)  # 替换全连接层
     net.to(device)
 
     # define loss function

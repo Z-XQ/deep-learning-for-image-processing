@@ -2,15 +2,25 @@ import torch.nn as nn
 import torch
 
 
+# resnet18, resnet34的残差模块：两个 conv3x3+bn+relu
 class BasicBlock(nn.Module):
-    expansion = 1
+    expansion = 1  # 对于resnet18, resnet34的残差模块，输入到残差模块和输出的通道数是一样的。
 
     def __init__(self, in_channel, out_channel, stride=1, downsample=None, **kwargs):
+        """
+        注意一点：残差块是先跳层连接，后激活
+        in_channel: 残差块的输入通道数
+        out_channel: 残差块的输出通道数
+        stride: 如果等于2，该残差块会下采样.
+        downsample: 跳层连接时下采样模块(resnet50, resnet101需要)。
+        """
         super(BasicBlock, self).__init__()
+
         self.conv1 = nn.Conv2d(in_channels=in_channel, out_channels=out_channel,
                                kernel_size=3, stride=stride, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channel)
         self.relu = nn.ReLU()
+
         self.conv2 = nn.Conv2d(in_channels=out_channel, out_channels=out_channel,
                                kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(out_channel)
@@ -23,7 +33,7 @@ class BasicBlock(nn.Module):
 
         out = self.conv1(x)
         out = self.bn1(out)
-        out = self.relu(out)
+        out = self.relu(out)  # 共用一个relu函数
 
         out = self.conv2(out)
         out = self.bn2(out)
@@ -34,6 +44,11 @@ class BasicBlock(nn.Module):
         return out
 
 
+# resnet50, resnet101, resnet152的残差模块：
+#   conv1x1: in_channel->out_channel
+#   conv3x3: out_channel->out_channel, stride=2/1
+#   conv1x1: out_channel->out_channel*4
+#   downsample: 跳层连接时的下采样。每个layer的第一个残差块都要下采样。
 class Bottleneck(nn.Module):
     """
     注意：原论文中，在虚线残差结构的主分支上，第一个1x1卷积层的步距是2，第二个3x3卷积层步距是1。
@@ -41,10 +56,13 @@ class Bottleneck(nn.Module):
     这么做的好处是能够在top1上提升大概0.5%的准确率。
     可参考Resnet v1.5 https://ngc.nvidia.com/catalog/model-scripts/nvidia:resnet_50_v1_5_for_pytorch
     """
-    expansion = 4
+    expansion = 4  # 对于resnet34以上的，每个残差模块的第三个卷积的输出通道数会翻4倍
 
     def __init__(self, in_channel, out_channel, stride=1, downsample=None,
                  groups=1, width_per_group=64):
+        """
+        width_per_group: 在
+        """
         super(Bottleneck, self).__init__()
 
         width = int(out_channel * (width_per_group / 64.)) * groups
@@ -52,6 +70,7 @@ class Bottleneck(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=in_channel, out_channels=width,
                                kernel_size=1, stride=1, bias=False)  # squeeze channels
         self.bn1 = nn.BatchNorm2d(width)
+        # 共用一个relu函数
         # -----------------------------------------
         self.conv2 = nn.Conv2d(in_channels=width, out_channels=width, groups=groups,
                                kernel_size=3, stride=stride, bias=False, padding=1)
@@ -94,6 +113,10 @@ class ResNet(nn.Module):
                  include_top=True,
                  groups=1,
                  width_per_group=64):
+        """
+        block: 如果是resnet18, resnet34, 则是传入BasicBlock，否则是Bottleneck
+        blocks_num: 每一个layer中残差结构的数量
+        """
         super(ResNet, self).__init__()
         self.include_top = include_top
         self.in_channel = 64
@@ -119,8 +142,13 @@ class ResNet(nn.Module):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
 
     def _make_layer(self, block, channel, block_num, stride=1):
+        """
+        channel: 当前layer第一个conv卷积核个数
+        block_num: 当前layer有多少个残差结构
+        """
+        # 下采样模块有两张情况：对于resnet50及以上的第一个layer的第一个残差块，需要增加channel维度;
         downsample = None
-        if stride != 1 or self.in_channel != channel * block.expansion:
+        if stride != 1 or self.in_channel != channel * block.expansion:  # in_channel==64不等于channel*4/1
             downsample = nn.Sequential(
                 nn.Conv2d(self.in_channel, channel * block.expansion, kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(channel * block.expansion))
@@ -132,7 +160,7 @@ class ResNet(nn.Module):
                             stride=stride,
                             groups=self.groups,
                             width_per_group=self.width_per_group))
-        self.in_channel = channel * block.expansion
+        self.in_channel = channel * block.expansion  # 更新in_channel
 
         for _ in range(1, block_num):
             layers.append(block(self.in_channel,
@@ -156,7 +184,7 @@ class ResNet(nn.Module):
         if self.include_top:
             x = self.avgpool(x)
             x = torch.flatten(x, 1)
-            x = self.fc(x)
+            x = self.fc(x)  # 最后一层是全连接层
 
         return x
 
