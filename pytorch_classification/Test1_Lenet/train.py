@@ -9,7 +9,9 @@ import torchvision.transforms as transforms
 def main():
     transform = transforms.Compose(
         [transforms.ToTensor(),
-         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+         # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+         ]
+    )
 
     # 50000张训练图片
     # 第一次使用时要将download设置为True才会自动去下载数据集
@@ -35,7 +37,7 @@ def main():
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(net.parameters(), lr=0.001)
 
-    for epoch in range(5):  # loop over the dataset multiple times
+    for epoch in range(200):  # loop over the dataset multiple times
         net.train()
         running_loss = 0.0
         for step, data in enumerate(train_loader, start=0):
@@ -77,16 +79,20 @@ if __name__ == '__main__':
     main()
     """
     Files already downloaded and verified
-    [1,   500] train_loss: 1.706  test_accuracy: 0.461
-    [1,  1000] train_loss: 1.421  test_accuracy: 0.534
-    [2,   500] train_loss: 1.200  test_accuracy: 0.587
-    [2,  1000] train_loss: 1.132  test_accuracy: 0.596
-    [3,   500] train_loss: 1.015  test_accuracy: 0.640
-    [3,  1000] train_loss: 1.000  test_accuracy: 0.653
-    [4,   500] train_loss: 0.900  test_accuracy: 0.659
-    [4,  1000] train_loss: 0.904  test_accuracy: 0.657
-    [5,   500] train_loss: 0.822  test_accuracy: 0.660
-    [5,  1000] train_loss: 0.843  test_accuracy: 0.642
+    [1] train_loss: 1.652  test_accuracy: 0.493
+    [2] train_loss: 1.349  test_accuracy: 0.551
+    [3] train_loss: 1.226  test_accuracy: 0.569
+    [4] train_loss: 1.137  test_accuracy: 0.589
+    [5] train_loss: 1.069  test_accuracy: 0.608
+    [6] train_loss: 1.009  test_accuracy: 0.633
+    [7] train_loss: 0.961  test_accuracy: 0.642
+    [8] train_loss: 0.911  test_accuracy: 0.648
+    [9] train_loss: 0.873  test_accuracy: 0.652
+    [10] train_loss: 0.837  test_accuracy: 0.661
+    [11] train_loss: 0.810  test_accuracy: 0.662
+    [12] train_loss: 0.783  test_accuracy: 0.670
+    [13] train_loss: 0.762  test_accuracy: 0.663
+    [14] train_loss: 0.742  test_accuracy: 0.669
     Finished Training
 
     """

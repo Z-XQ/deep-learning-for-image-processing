@@ -21,7 +21,7 @@ def main():
 
     net.load_state_dict(torch.load('Lenet.pth'))
 
-    im = Image.open('plane.png')
+    im = Image.open('cat.png')
     im = transform(im)  # [C, H, W]
     im = torch.unsqueeze(im, dim=0)  # [N, C, H, W]
 
