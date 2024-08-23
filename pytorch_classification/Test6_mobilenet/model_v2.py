@@ -29,6 +29,7 @@ class ConvBNReLU(nn.Sequential):
         )
 
 
+# 1x1 pointwise conv + 3x3 depthwise conv + 1x1 pointwise conv(linear)
 class InvertedResidual(nn.Module):
     def __init__(self, in_channel, out_channel, stride, expand_ratio):
         super(InvertedResidual, self).__init__()

@@ -8,7 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torchvision import transforms
 import torch.optim.lr_scheduler as lr_scheduler
 
-from model import efficientnet_b0 as create_model
+from model_tmp import efficientnet_b0 as create_model
 from my_dataset import MyDataSet
 from utils import read_split_data, train_one_epoch, evaluate
 
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     # 数据集所在根目录
     # https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz
     parser.add_argument('--data-path', type=str,
-                        default="/data/flower_photos")
+                        default=r"D:\zxq\code\python\deep-learning-for-image-processing\data_set\flower_data\flower_photos")
 
     # download model weights
     # 链接: https://pan.baidu.com/s/1ouX0UmjCsmSx3ZrqXbowjw  密码: 090i
@@ -143,3 +143,24 @@ if __name__ == '__main__':
     opt = parser.parse_args()
 
     main(opt)
+
+    """efficientnetb0
+    [epoch 0] mean loss 0.6: 100%|██████████| 184/184 [01:08<00:00,  2.69it/s]
+    100%|██████████| 46/46 [00:16<00:00,  2.80it/s]
+    [epoch 0] accuracy: 0.899
+    [epoch 1] mean loss 0.366: 100%|██████████| 184/184 [01:03<00:00,  2.91it/s]
+    100%|██████████| 46/46 [00:16<00:00,  2.81it/s]
+    [epoch 1] accuracy: 0.91
+    [epoch 2] mean loss 0.317: 100%|██████████| 184/184 [01:03<00:00,  2.90it/s]
+    100%|██████████| 46/46 [00:16<00:00,  2.71it/s]
+    [epoch 2] accuracy: 0.926
+    [epoch 3] mean loss 0.269: 100%|██████████| 184/184 [01:03<00:00,  2.90it/s]
+    100%|██████████| 46/46 [00:17<00:00,  2.61it/s]
+    [epoch 3] accuracy: 0.926
+    [epoch 4] mean loss 0.254: 100%|██████████| 184/184 [01:03<00:00,  2.88it/s]
+    100%|██████████| 46/46 [00:18<00:00,  2.53it/s]
+    [epoch 4] accuracy: 0.94
+    [epoch 5] mean loss 0.209: 100%|██████████| 184/184 [01:05<00:00,  2.79it/s]
+    100%|██████████| 46/46 [00:20<00:00,  2.27it/s]
+    [epoch 5] accuracy: 0.94
+    """

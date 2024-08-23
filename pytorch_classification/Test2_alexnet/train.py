@@ -41,8 +41,9 @@ def main():
     with open('class_indices.json', 'w') as json_file:
         json_file.write(json_str)
 
-    batch_size = 4
-    nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])  # number of workers
+    batch_size = 16
+    # nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])  # number of workers
+    nw = 0  # number of workers
     print('Using {} dataloader workers every process'.format(nw))
 
     train_loader = torch.utils.data.DataLoader(train_dataset,
@@ -130,4 +131,46 @@ def main():
 
 
 if __name__ == '__main__':
+    """ libtorch with no rand init weight
+    Epoch: 0, Training Loss: 0.74375838041305542
+    Epoch: 1, Training Loss: 0.90064239501953125
+    Epoch: 2, Training Loss: 1.34159445762634284
+    Epoch: 3, Training Loss: 0.75602966547012329
+    Epoch: 4, Training Loss: 0.70253342390060425
+    Epoch: 5, Training Loss: 0.90282332897186279
+    Epoch: 6, Training Loss: 0.47993755340576172
+    Epoch: 7, Training Loss: 0.86767882108688354
+    Epoch: 8, Training Loss: 0.78316569328308105
+    Epoch: 9, Training Loss: 0.52741509675979614
+    Epoch: 10, Training Loss: 0.58984518051147461
+    
+    libtorch with kaiming_normal_
+    Epoch: 0, Training Loss: 1.57387423515319829
+    Epoch: 1, Training Loss: 0.88000547885894775
+    Epoch: 2, Training Loss: 0.91211783885955811
+    Epoch: 3, Training Loss: 0.54084092378616333
+    Epoch: 4, Training Loss: 0.98211300373077393
+    Epoch: 5, Training Loss: 0.71742963790893555
+    Epoch: 6, Training Loss: 0.14369988441467285
+    Epoch: 7, Training Loss: 0.36351940035820007
+    Epoch: 8, Training Loss: 0.45700043439865112
+    Epoch: 9, Training Loss: 0.53762894868850708
+    Epoch: 10, Training Loss: 0.46801453828811646
+    """
+
+    """pytorch
+    [epoch 1] train_loss: 1.371  val_accuracy: 0.456
+    [epoch 2] train_loss: 1.178  val_accuracy: 0.530
+    [epoch 3] train_loss: 1.099  val_accuracy: 0.615
+    [epoch 4] train_loss: 1.016  val_accuracy: 0.624
+    [epoch 5] train_loss: 0.977  val_accuracy: 0.673
+    [epoch 6] train_loss: 0.946  val_accuracy: 0.668
+    [epoch 7] train_loss: 0.910  val_accuracy: 0.643
+    [epoch 8] train_loss: 0.866  val_accuracy: 0.596
+    [epoch 9] train_loss: 0.879  val_accuracy: 0.654
+    [epoch 10] train_loss: 0.821  val_accuracy: 0.692
+    Finished Training
+
+    """
+
     main()

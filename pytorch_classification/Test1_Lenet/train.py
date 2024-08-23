@@ -17,7 +17,7 @@ def main():
     # 第一次使用时要将download设置为True才会自动去下载数据集
     train_set = torchvision.datasets.CIFAR10(root='./data', train=True,
                                              download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=36,
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=128,
                                                shuffle=True, num_workers=0)
 
     # 10000张验证图片
@@ -56,6 +56,8 @@ def main():
 
             # print statistics
             running_loss += loss.item()
+
+            print('[%d] train_loss: %.3f' %(epoch + 1, loss.item()))
 
         net.train()
         with torch.no_grad():  # 进入eval模型，节省资源

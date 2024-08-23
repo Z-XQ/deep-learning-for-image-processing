@@ -16,6 +16,9 @@ def main():
     print("using {} device.".format(device))
 
     # 要使用官方预训练权重，就必须和官方有一样的数据预处理
+    # size: 裁剪之后缩放输出的大小。
+    # scale: 一个形如 (min_scale, max_scale) 的二元组，表示裁剪区域相对于原图面积的比例范围。
+    # ratio: 一个形如 (min_ratio, max_ratio) 的二元组，表示裁剪区域的宽高比范围。例如，ratio=(3/4, 4/3) 表示裁剪区域的宽高比在3:4到4:3之间随机选择。
     data_transform = {
         "train": transforms.Compose([transforms.RandomResizedCrop(224),
                                      transforms.RandomHorizontalFlip(),
