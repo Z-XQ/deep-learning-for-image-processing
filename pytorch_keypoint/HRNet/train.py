@@ -18,7 +18,7 @@ def create_model(num_joints, load_pretrain_weights=True):
     if load_pretrain_weights:
         # 载入预训练模型权重
         # 链接:https://pan.baidu.com/s/1Lu6mMAWfm_8GGykttFMpVw 提取码:f43o
-        weights_dict = torch.load("./hrnet_w32.pth", map_location='cpu')
+        weights_dict = torch.load(r"D:\weights\pytorch\imagenet/hrnet_w32-36af842e.pth", map_location='cpu')
 
         for k in list(weights_dict.keys()):
             # 如果载入的是imagenet权重，就删除无用权重
